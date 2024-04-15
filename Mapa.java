@@ -8,19 +8,20 @@ import java.util.List;
 import java.util.Map;
 
 public class Mapa {
-    private List<String> mapa;
+    private static List<String> mapa;
     private Map<Character, ElementoMapa> elementos;
-    private int x = 50; // Posição inicial X do personagem
-    private int y = 50; // Posição inicial Y do personagem
+    private int x = 1; // Posição inicial X do personagem
+    private int y = 1; // Posição inicial Y do personagem
     private final int TAMANHO_CELULA = 10; // Tamanho de cada célula do mapa
     private boolean[][] areaRevelada; // Rastreia quais partes do mapa foram reveladas
     private final Color brickColor = new Color(153, 76, 0); // Cor marrom para tijolos
     private final Color vegetationColor = new Color(34, 139, 34); // Cor verde para vegetação
     private final Color corVermelha = new Color(255, 0, 0); 
     private final Color corVerde = new Color(0, 255, 0);
+    private final Color corMarrom = new Color(139, 69, 19);
+    private final Color corDourada = new Color(255, 215, 0);
+
     private final int RAIO_VISAO = 5; // Raio de visão do personagem
-    private Thread alternarViloesThread;
-    private boolean threadAtiva;
     private List<MapObject> listaBaus = new ArrayList<>();
     private List<MapObject> listaVilao = new ArrayList<>();
 
@@ -32,10 +33,7 @@ public class Mapa {
         armazenaElementos();
         areaRevelada = new boolean[mapa.size()+1000][mapa.get(0).length()+1000];
         atualizaCelulasReveladas();
-        iniciarThreadAlternarViloes();
     }
-
-    
     public int getX() {
         return x;
     }
@@ -68,7 +66,8 @@ public class Mapa {
     // Move conforme enum Direcao
     public boolean move(Direcao direcao) {
         int dx = 0, dy = 0;
-        
+        System.out.println(x);
+        System.out.println(y);
         switch (direcao) {
             case CIMA:
             dy = -TAMANHO_CELULA;
@@ -100,19 +99,18 @@ public class Mapa {
     }
     
     public void armazenaElementos() {
-        for (int i = 0; i < getNumColunas(); i++) {
-            for (int j = 0; j < getNumLinhas(); j++) {
-                char caractere = linha.charAt(j);
+        for (int i = 0; i < mapa.size(); i++) {
+            String linha = mapa.get(i);
+            for (int j = 0; j < linha.length(); j++) {
+                char caractere = linha.charAt(j);                
                 if (caractere == 'B') {
-                    listaBaus.add(new MapObject('B', i, j));
+                    listaBaus.add(new MapObject('B', j, i));
                 }
                 if (caractere == 'M') {
-                    listaVilao.add(new MapObject('M', i, j));
+                    listaVilao.add(new MapObject('M', j, i));
                 }
             }
         }
-        System.out.println(listaBaus);
-        System.out.println(listaVilao);
     }
 
     // Verifica se o personagem pode se mover para a próxima posição
@@ -145,14 +143,53 @@ public class Mapa {
         return false;
     }
 
+
     public String interage() {
-        //TODO: Implementar
-        return "Interage";
+        if(achaBau()){
+            elementos.put('B', new Tesouro('B', corDourada));
+            return "Parabens achou o bau"; 
+        }
+        return("não achou algo para interagir");
+
+    }
+    public boolean achavilao(){
+        for(int i = 0; i < listaVilao.size(); i++){
+            MapObject objetoVilao = listaVilao.get(i);
+            System.out.println(objetoVilao);
+            System.out.println(objetoVilao.getX());
+            System.out.println(objetoVilao.getY());
+            System.out.println(getX() + " " + getY());
+            if(calculaDistancia(getX(), objetoVilao.getX() * 10, getY(), objetoVilao.getY() * 10) <= 20.0){
+                return true;
+            }
+            System.out.println(calculaDistancia(getX(), getY(), objetoVilao.getX() * 10, objetoVilao.getY() * 10));
+        }
+        return false;
+    }
+    public boolean achaBau(){
+        for(int i = 0; i < listaBaus.size(); i++){
+            MapObject objetoBau = listaBaus.get(i);
+            if(calculaDistancia(getX(), objetoBau.getX() * 10, getY(), objetoBau.getY() * 10) <= 20.0){
+                return true;
+            }
+            // if(getX() == objetoBau.getX() * 10 && getY() == objetoBau.getY() * 10){
+            //     System.out.println("teste");
+            //     return true;
+            // }
+        }
+        return false;
+    }
+    public double calculaDistancia(int x1, int x2, int y1, int y2){
+        return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
 
     public String ataca() {
-        //TODO: Implementar
-        return "Ataca";
+        if(achavilao()){
+            elementos.put('M', new Vilao('X', corVerde));
+            return "Parabens voce matou o vilão";
+        }
+        return("não tem nenhum vilão por perto");
+
     }
 
     private void carregaMapa(String filename) {
@@ -185,33 +222,16 @@ public class Mapa {
     }
 
     // Registra os elementos do mapa
-    private void registraElementos() {
+    public void registraElementos() {
         // Parede
         elementos.put('#', new Parede('▣', brickColor));
         elementos.put('V', new Vegetacao('♣', vegetationColor));
-        elementos.put('M', new Vilao('⊄', corVerde));
+        elementos.put('M', new Vilao('⊄', corVermelha));
         elementos.put('Y', new Vilao(' ', corVermelha));
         elementos.put('T', new Portal('#', corVermelha));
         elementos.put('B', new Tesouro('B', corMarrom));        
     }
-
-    private void iniciarThreadAlternarViloes() {
-        threadAtiva = true;
-        alternarViloesThread = new Thread(() -> {
-            while (threadAtiva) {
-                try {
-                    alternarViloes();
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
-        alternarViloesThread.start();
-    }
-    private void alternarViloes() {
-        // Percorre o mapa (lista de strings) e altera 'M' para 'Y' e vice-versa
+    public void alternarViloes() {
         for (int i = 0; i < mapa.size(); i++) {
             String linha = mapa.get(i);
             StringBuilder novaLinha = new StringBuilder();
@@ -228,4 +248,6 @@ public class Mapa {
             mapa.set(i, novaLinha.toString());
         }
     }
+
+    
 }

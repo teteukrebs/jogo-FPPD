@@ -8,7 +8,9 @@ public class Jogo extends JFrame implements KeyListener {
     private Mapa mapa;
     private final Color fogColor = new Color(192, 192, 192, 150); // Cor cinza claro com transparência para nevoa
     private final Color characterColor = Color.BLACK; // Cor preta para o personagem
-
+    public Thread alternarViloesThread;
+    private boolean threadAtiva;
+    
     public Jogo(String arquivoMapa) {
         setTitle("Jogo de Aventura");
         setSize(800, 600);
@@ -85,7 +87,26 @@ public class Jogo extends JFrame implements KeyListener {
 
         // Adiciona o listener para eventos de teclado
         addKeyListener(this);
+        iniciarThreadAlternarViloes();
     }
+    private void iniciarThreadAlternarViloes() {
+        threadAtiva = true;
+        alternarViloesThread = new Thread(() -> {
+            while (threadAtiva) {
+                try {
+                    // Chama o método para alternar os vilões no mapa
+                    mapa.alternarViloes();
+                    // Redesenha o mapa após a alteração
+                    repaint();
+                    Thread.sleep(1000); // Aguarda 1 segundo antes de alternar novamente
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        alternarViloesThread.start();
+    }
+
 
     public void move(Direcao direcao) {
         if (mapa == null)
@@ -188,7 +209,7 @@ public class Jogo extends JFrame implements KeyListener {
     public void keyReleased(KeyEvent e) {
         // Não necessário
     }
-
+    
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             new Jogo("mapa.txt").setVisible(true);

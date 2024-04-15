@@ -1,0 +1,74 @@
+<div class="_form_element _x90789855 _full_width " >
+      <label for="field[1]" class="_form-label">
+        UTM Source Captura
+      </label>
+      <div class="_field-wrapper">
+      </div>
+      <input type="hidden" name="field[1]" id="utm_campaign" value>    
+</div>
+      </div>
+    </div>
+    <div class="_form_element _x41524838 _full_width " >
+      <label for="field[2]" class="_form-label">
+        UTM Medium Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="hidden" name="field[2]" id="utm_medium" value>
+      </div>
+    </div>
+    <div class="_form_element _x79231453 _full_width " >
+      <label for="field[3]" class="_form-label">
+        UTM Campaign Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="hidden" name="field[3]" id="utm_source" value> 
+      </div>
+    </div>
+    <div class="_form_element _x05109692 _full_width " >
+      <label for="field[4]" class="_form-label">
+        UTM Term Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="hidden" name="field[4]" id="utm_term" value>
+      </div>
+    </div>
+    <div class="_form_element _x92645471 _full_width " >
+      <label for="field[5]" class="_form-label">
+        UTM Content Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="hidden" name="field[5]" id="utm_content" value>
+      </div>
+    </div>
+    <div class="_form_element _x72834039 _full_width " >
+      <label for="field[6]" class="_form-label">
+        GCLID Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="text" id="field[6]" name="field[6]" value="" placeholder="" />
+      </div>
+    </div>
+    <div class="_form_element _x02114348 _full_width " >
+      <label for="field[7]" class="_form-label">
+        MSCLKID Captura
+      </label>
+      <div class="_field-wrapper">
+        <input type="text" id="field[7]" name="field[7]" value="" placeholder="" />
+      </div>
+    </div>
+    <div class="_form_element _x72026423 _full_width " >
+      <label for="field[8]" class="_form-label">
+        Domínio
+      </label>
+      <div class="_field-wrapper">
+        <input type="text" id="field[8]" name="field[8]" value="" placeholder="" />
+      </div>
+    </div>
+    <div class="_form_element _x34044427 _full_width " >
+      <label for="field[9]" class="_form-label">
+        Produto
+      </label>
+      <div class="_field-wrapper">
+        <input type="text" id="field[9]" name="field[9]" value="" placeholder="" />
+      </div>
+    </div>

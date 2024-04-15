@@ -19,7 +19,7 @@ public class Vilao implements ElementoMapa {
 
     @Override
     public boolean podeSerAtravessado() {
-        return true;
+        return false;
     }
 
     @Override
