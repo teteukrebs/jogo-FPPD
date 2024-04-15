@@ -20,10 +20,13 @@ public class Mapa {
     private final Color corVerde = new Color(0, 255, 0);
     private final Color corMarrom = new Color(139, 69, 19);
     private final Color corDourada = new Color(255, 215, 0);
+    private final Color corRoxa = new Color(128, 0, 128);
+
 
     private final int RAIO_VISAO = 5; // Raio de visão do personagem
     private List<MapObject> listaBaus = new ArrayList<>();
     private List<MapObject> listaVilao = new ArrayList<>();
+    private List<MapObject> listaPortal = new ArrayList<>();
 
     public Mapa(String arquivoMapa) {
         mapa = new ArrayList<>();
@@ -83,6 +86,7 @@ public class Mapa {
             break;
             default:
             return false;
+
         }
         
         if (!podeMover(x + dx, y + dy)) {
@@ -108,6 +112,9 @@ public class Mapa {
                 }
                 if (caractere == 'M') {
                     listaVilao.add(new MapObject('M', j, i));
+                }
+                if(caractere == 'T'){
+                    listaPortal.add(new MapObject('T', j, i));
                 }
             }
         }
@@ -141,6 +148,9 @@ public class Mapa {
         }
 
         return false;
+    }
+    public interface BauEncontradoListener {
+        void baúEncontrado();
     }
 
 
@@ -179,6 +189,16 @@ public class Mapa {
         }
         return false;
     }
+    public boolean achaPortal(){
+        for(int i = 0; i < listaPortal.size(); i++){
+            MapObject objetoPortal = listaPortal.get(i);
+            if (calculaDistancia(getX(), objetoPortal.getX() * 10, getY(), objetoPortal.getY() * 10) <= 20.0) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public double calculaDistancia(int x1, int x2, int y1, int y2){
         return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
     }
@@ -188,10 +208,17 @@ public class Mapa {
             elementos.put('M', new Vilao('X', corVerde));
             return "Parabens voce matou o vilão";
         }
-        return("não tem nenhum vilão por perto");
-
+        if(achaPortal()){
+            teleporta();
+            return("pegou o portal");
+        }
+        return("não tem nem vilões ou portais por perto");
     }
-
+    public void teleporta(){
+        x = (getNumColunas() - 1 - x / TAMANHO_CELULA) * TAMANHO_CELULA;
+        y = (getNumLinhas() - 1 - y / TAMANHO_CELULA) * TAMANHO_CELULA;
+        atualizaCelulasReveladas();
+    }
     private void carregaMapa(String filename) {
         try (BufferedReader br = new BufferedReader(new FileReader(filename))) {
             String line;
@@ -228,8 +255,26 @@ public class Mapa {
         elementos.put('V', new Vegetacao('♣', vegetationColor));
         elementos.put('M', new Vilao('⊄', corVermelha));
         elementos.put('Y', new Vilao(' ', corVermelha));
-        elementos.put('T', new Portal('#', corVermelha));
-        elementos.put('B', new Tesouro('B', corMarrom));        
+        elementos.put('T', new Portal('#', corRoxa));
+        elementos.put('B', new Tesouro('B', corMarrom));  
+        elementos.put('Z',new Portal(' ', corDourada));      
+    }
+    public void alternarPortal() {
+        for (int i = 0; i < mapa.size(); i++) {
+            String linha = mapa.get(i);
+            StringBuilder novaLinha = new StringBuilder();
+            for (int j = 0; j < linha.length(); j++) {
+                char caractere = linha.charAt(j);
+                if (caractere == 'T') {
+                    novaLinha.append('Z');
+                } else if (caractere == 'Z') {
+                    novaLinha.append('T');
+                } else {
+                    novaLinha.append(caractere);
+                }
+            }
+            mapa.set(i, novaLinha.toString());
+        }
     }
     public void alternarViloes() {
         for (int i = 0; i < mapa.size(); i++) {
@@ -248,6 +293,16 @@ public class Mapa {
             mapa.set(i, novaLinha.toString());
         }
     }
-
-    
+    public void bauMove(){
+        for (MapObject bau : listaBaus) {
+            int currentX = bau.getX();
+            int currentY = bau.getY();
+            int newX = (int) (Math.random() * getNumColunas());
+            int newY = (int) (Math.random() * getNumLinhas());
+            bau.setX(newX);
+            bau.setY(newY);
+            mapa.set(newY, mapa.get(newY).substring(0, newX) + 'B' + mapa.get(newY).substring(newX + 1));
+            mapa.set(currentY, mapa.get(currentY).substring(0, currentX) + ' ' + mapa.get(currentY).substring(currentX + 1));
+        }
+    } 
 }

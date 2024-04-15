@@ -9,7 +9,11 @@ public class Jogo extends JFrame implements KeyListener {
     private final Color fogColor = new Color(192, 192, 192, 150); // Cor cinza claro com transparência para nevoa
     private final Color characterColor = Color.BLACK; // Cor preta para o personagem
     public Thread alternarViloesThread;
+    public Thread andaBaus;
+    public Thread alternarPortalThread;
     private boolean threadAtiva;
+    public boolean threadAtivaBau;
+    private boolean threadAtivaPortal;
     
     public Jogo(String arquivoMapa) {
         setTitle("Jogo de Aventura");
@@ -87,24 +91,54 @@ public class Jogo extends JFrame implements KeyListener {
 
         // Adiciona o listener para eventos de teclado
         addKeyListener(this);
-        iniciarThreadAlternarViloes();
+        ThreadAlternarViloes();
+        ThreadAndaBaus();
+        ThreadAlternarPortal();
     }
-    private void iniciarThreadAlternarViloes() {
+    private void ThreadAndaBaus(){
+        threadAtivaBau = true;
+        andaBaus = new Thread(() ->{
+            while(threadAtivaBau){
+                try{
+                    mapa.bauMove();
+                    repaint();
+                    Thread.sleep(10000); 
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        andaBaus.start();
+    }
+    private void ThreadAlternarViloes() {
         threadAtiva = true;
         alternarViloesThread = new Thread(() -> {
             while (threadAtiva) {
                 try {
-                    // Chama o método para alternar os vilões no mapa
                     mapa.alternarViloes();
-                    // Redesenha o mapa após a alteração
                     repaint();
-                    Thread.sleep(1000); // Aguarda 1 segundo antes de alternar novamente
+                    Thread.sleep(5000); 
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
             }
         });
         alternarViloesThread.start();
+    }
+    private void ThreadAlternarPortal() {
+        threadAtivaPortal = true;
+        alternarPortalThread = new Thread(() -> {
+            while (threadAtivaPortal) {
+                try {
+                    mapa.alternarPortal();
+                    repaint();
+                    Thread.sleep(5000); 
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        alternarPortalThread.start();
     }
 
 
