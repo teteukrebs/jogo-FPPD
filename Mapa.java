@@ -17,6 +17,7 @@ public class Mapa {
     private final Color brickColor = new Color(153, 76, 0); // Cor marrom para tijolos
     private final Color vegetationColor = new Color(34, 139, 34); // Cor verde para vegetação
     private final Color corVermelha = new Color(255, 0, 0); 
+    private final Color corMarrom = new Color(139, 69, 19);
     private final Color corVerde = new Color(0, 255, 0);
     private final int RAIO_VISAO = 5; // Raio de visão do personagem
     private Thread alternarViloesThread;
@@ -171,6 +172,8 @@ public class Mapa {
         elementos.put('V', new Vegetacao('♣', vegetationColor));
         elementos.put('M', new Vilao('⊄', corVerde));
         elementos.put('Y', new Vilao(' ', corVermelha));
+        elementos.put('T', new Portal('#', corVermelha));
+        elementos.put('B', new Tesouro('B', corMarrom));
         
     }
     private void iniciarThreadAlternarViloes() {
